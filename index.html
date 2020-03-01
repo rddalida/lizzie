@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<head>
+	<title> 3-E3: Palindromes </title>
+	<meta charset="utf-8" />
+	<meta name="description" content="Check if a number is a palindrome or not"/>
+	<meta name="keyword" content="HTML, CSS, JS" />
+	<meta name="author" content="Dylan Dalida" />
+	<style>
+		body {
+			background-color: black;
+			color: #FFFFFF;
+		}
+		input {
+			border-style: none;
+			background-color: inherit;
+			color: inherit;
+			font-family: inherit;
+		}
+		.terminal {
+			background-color: #222222;
+			font-family: "Courier New", "Courier", "Ubuntu Mono", "Ubuntu";
+			color: #33FF00;
+			height: 600px;
+			width: 800px;
+			margin-left: 20%;
+			margin-right: 20%;
+			padding: 1%;
+			left: 0;
+			right: 0;
+			border: 2px solid #33FF00;
+		}
+		.dialogue {
+			background-color: #111111;
+			font-family: "Montserrat", "Comfortaa", "Verdana";
+			color: #FFFFFF;
+			height: 200px;
+			width: 800px;
+			margin-top: 5%;
+			margin-left: 20%;
+			margin-right: 20%;
+			padding: 1%;
+			left: 0;
+			right: 0;
+			border: 2px solid white;
+		}
+	</style>
+	<script>
+		console.log("hi!");
+		// note: for strings, please use a tilde ~ if you want to add a new line
+		var sMain = ["Welcome to Cormeum Access Terminal~Username: ", "~Username: "];
+		var sPWrong = "~Incorrect password.~";
+		var sUWrong = "~Username not found.~`";
+		var printText = function(s, x) { // prints text in the terminal
+			if(x < s.length) {
+				if(s.charAt(x) == '~') {
+					document.getElementById("terminal").innerHTML += "<br>";
+					setTimeout(() => { printText(s, x+1); }, 1000);
+				}
+				else {
+					document.getElementById("terminal").innerHTML += s.charAt(x);
+					setTimeout(() => { printText(s, x+1); }, 70);
+				}
+			}
+		}
+		var addSpeech = function(s) { // adds the speech sa baba, but clears all previous speech
+			document.getElementById("dialogue").innerHTML = s;
+		}
+		var addInput = function() { // add the input 
+			document.getElementById("terminal").innerHTML += '<input type="text" id="playerInput" autofocus><button type="submit" style="visibility: hidden;">';
+			document.getElementById("playerInput").focus();
+		}
+		var readInput = function() { // function for getting input
+			let inp = document.getElementById("playerInput").value;
+			if(inp == "test") printText("~~Correct!");
+			return inp;
+		}
+		var terminalStart = function() { // function for choosing what to print - ito yung tatawagin once you click start
+			printText(sMain[0], 0);
+			setTimeout(() => {addSpeech("Oh, hi! I see you've stumbled upon my computer. Can you help me?"); addInput();}, sMain[0].length*70+930);
+		}
+		$(document).ready(function(){
+ 		   $('#playerInput').keypress(function(e){
+  		     if(e.keyCode==13)
+ 		     	$(document).readInput();
+ 		   });
+		});
+	</script>
+</head>
+<body>
+	<button type="button" onclick="terminalStart()">Start!</button>
+	<div class="terminal" id="terminal"> <!--green-->
+		
+	</div>
+	<div class="dialogue" id="dialogue"> <!--white-->
+
+	</div>
+</body>

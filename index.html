@@ -75,6 +75,7 @@
 			return inp;
 		}
 		var terminalStart = function() { // function for choosing what to print - ito yung tatawagin once you click start
+			document.getElementById("startButton").style.visibility = "hidden";
 			printText(sMain[0], 0);
 			setTimeout(() => {addSpeech("Oh, hi! I see you've stumbled upon my computer. Can you help me?"); addInput();}, sMain[0].length*70+930);
 		}
@@ -87,7 +88,7 @@
 	</script>
 </head>
 <body>
-	<button type="button" onclick="terminalStart()">Start!</button>
+	<button type="button" onclick="terminalStart()" id="startButton">Start!</button>
 	<div class="terminal" id="terminal"> <!--green-->
 		
 	</div>

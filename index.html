@@ -1,20 +1,42 @@
 <!DOCTYPE html>
 <head>
-	<title> Lizzie </title>
+	<title> Lizzie </title> <!--narrative: https://docs.google.com/document/d/1y3haiQlp7WBbp-3doUv9EdpjlOtk7HC67qmLCjbsKK4/edit?fbclid=IwAR0QZQ6yI3Hg3s3R0BUAMzacVr5dDYTDyQXLTRfCgbSlvU-nB6lm7oGxmmA-->
 	<meta charset="utf-8" />
 	<meta name="description" content="Can you help me?"/>
 	<meta name="keyword" content="HTML, CSS, JS" />
 	<meta name="author" content="Dylan Dalida" />
 	<style>
 		body {
+			font-family: "Montserrat", "Comfortaa", "Segoe UI", "Calibri", "Verdana";
 			background-color: black;
 			color: #FFFFFF;
+			/* Put a font here! */
 		}
 		input {
 			border-style: none;
+			outline: none;
 			background-color: inherit;
 			color: inherit;
 			font-family: inherit;
+			font-size: 1em;
+		}
+		.eventtext {
+			font-family: inherit;
+			padding-top: 10px;
+			padding-left: 10px;
+			border: 0px none black;
+			color: #FFFFFF;
+			background-color: inherit;
+			margin-bottom: 20px;
+			opacity: 1;
+		}
+		.unhidden {
+			visibility: visible;
+			opacity: 1;
+		}
+		.hidden {
+			opacity: 0;
+			transition: opacity 1s ease-in-out;
 		}
 		.terminal {
 			background-color: #222222;
@@ -24,75 +46,235 @@
 			width: 800px;
 			margin-left: 20%;
 			margin-right: 20%;
-			padding: 1%;
+			padding: 15px;
 			left: 0;
 			right: 0;
-			border: 2px solid #33FF00;
+			border: 5px solid #33FF00;
+			overflow: auto;
+			font-size: 0.97em;
 		}
 		.dialogue {
 			background-color: #111111;
-			font-family: "Montserrat", "Comfortaa", "Verdana";
-			color: #FFFFFF;
+			font-family: inherit;
+			color: pink;
 			height: 200px;
 			width: 800px;
 			margin-top: 5%;
 			margin-left: 20%;
 			margin-right: 20%;
-			padding: 1%;
+			padding: 15px;
 			left: 0;
 			right: 0;
 			border: 2px solid white;
+			overflow: scroll;
+		}
+		.firstbutton {
+			font-family: inherit;
+			padding: 20px;
+			font-size: inherit;
+			background-color: inherit;
+			border: 2px solid green;
+			color: green;
+			margin-left: 350px;
+			margin-right: 350px;
+			margin-top: 272px;
+			margin-bottom: 272px;
 		}
 	</style>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script>
-		console.log("hi!");
+		console.log("hi!"); // Hi! I've added super helpful hints if you want to add stuff in the code. Please add super helpful hints too ~grover
 		// note: for strings, please use a tilde ~ if you want to add a new line
-		var sMain = ["Welcome to Cormeum Access Terminal~Username: ", "~Username: "];
-		var sPWrong = "~Incorrect password.~";
-		var sUWrong = "~Username not found.~`";
-		var printText = function(s, x) { // prints text in the terminal
+		var step = 0; // This is used by terminalStart to analyze what step we're in
+		var attempts = 0; // Number of attempts, used in steps 2 and 3.
+		var isReady = false; // This is used by the keyUp jquery thing to check when to register enter presses
+		var isFirst = true; // This checks if the mistake was the first one.
+		var curDir = "/" // This displays the current directory.
+		var calcTime = function(s) { // Calculates the length of time it'll take for text in the terminal to load.
+			let ans = 0;
+			for(let i = 0; i < s.length; i++) {
+				if(s.charAt(i)=="~" || s.charAt(i)=="`") ans += 500;
+				else ans += 50;
+			}
+			return ans+500;
+		}
+		var calcTimeD = function(s) { // Calculates the length of time it'll take for the text in the dialog box to load.
+			let ans = 0;
+			for(let i = 0; i < s.length; i++) {
+				if(s.charAt(i)=="~" || s.charAt(i)=="`") ans += 300;
+				else ans += 30;
+			}
+			return ans+300;
+		}
+		var printEvent = function(s) { // Displays the event (colored in white) on the upper-left hand corner.
+			console.log(s);
+			var evt = document.getElementById("eventytext");
+			console.log(evt);
+			evt.innerHTML = s;
+			evt.className = "eventtext unhidden";
+			setTimeout(() => {evt.className = "eventtext hidden"}, 3000)
+		}
+		var printText = function(s, x = 0) { // Prints text in the terminal
+			isReady = false;
 			if(x < s.length) {
 				if(s.charAt(x) == '~') {
 					document.getElementById("terminal").innerHTML += "<br>";
-					setTimeout(() => { printText(s, x+1); }, 1000);
+					setTimeout(() => { printText(s, x+1); }, 500);
+				}
+				else if(s.charAt(x) == '`') {
+					setTimeout(() => { printText(s, x+1); }, 500);
 				}
 				else {
 					document.getElementById("terminal").innerHTML += s.charAt(x);
-					setTimeout(() => { printText(s, x+1); }, 70);
+					setTimeout(() => { printText(s, x+1); }, 50);
 				}
 			}
+			else isReady = true;
 		}
-		var addSpeech = function(s) { // adds the speech sa baba, but clears all previous speech
-			document.getElementById("dialogue").innerHTML = s;
+		var addSpeech = function(s, x = 0) { // Adds the dialogue at the bottom.
+			console.log("beepboop");
+			isReady = false;
+			if(x == 0) document.getElementById("dialogue").innerHTML = "";
+			if(x < s.length) {
+				if(s.charAt(x) == '~') {
+					document.getElementById("dialogue").innerHTML += "<br>";
+					setTimeout(() => { addSpeech(s, x+1); }, 300);
+				}
+				else if(s.charAt(x) == '`') {
+					setTimeout(() => { addSpeech(s, x+1); }, 300);
+				}
+				else {
+					document.getElementById("dialogue").innerHTML += s.charAt(x);
+					setTimeout(() => { addSpeech(s, x+1); }, 30);
+				}
+			}
+			else if(x>0) isReady = true;
 		}
-		var addInput = function() { // add the input 
-			document.getElementById("terminal").innerHTML += '<input type="text" id="playerInput" autofocus><button type="submit" style="visibility: hidden;">';
+		var addInput = function() { // Adds an input box.
+			var inpform = document.createElement("input");
+			inpform.type = "text";
+			inpform.id = "playerInput";
+			inpform.maxLength = 20;
+			document.getElementById("terminal").appendChild(inpform); 
 			document.getElementById("playerInput").focus();
 		}
-		var readInput = function() { // function for getting input
-			let inp = document.getElementById("playerInput").value;
-			if(inp == "test") printText("~~Correct!");
+		var readInput = function() { // Function for reading the input and replacing the box with text. MUST BE FOLLOWED by a validator once called
+			console.log("reading input!");
+			let inp = document.getElementById("playerInput").value.toLowerCase();
+			let termi = document.getElementById("terminal");
+			termi.removeChild(termi.childNodes[termi.childNodes.length-1])
+			termi.innerHTML += ' ' + inp + '\n';
 			return inp;
 		}
-		var terminalStart = function() { // function for choosing what to print - ito yung tatawagin once you click start
-			document.getElementById("startButton").style.visibility = "hidden";
-			printText(sMain[0], 0);
-			setTimeout(() => {addSpeech("Oh, hi! I see you've stumbled upon my computer. Can you help me?"); addInput();}, sMain[0].length*70+930);
+
+		var terminalStart = function() { // The "main" function with the game flow; it will be called once you click start or press enter
+			isReady = false;
+			console.log(step);
+			if(step == 0) { // Step 0: the intro step
+				$("#startButton").hide();
+				printText("Welcome to Cormeum Access Terminal~~Username: ");
+				setTimeout(() => {addInput(); isReady = true;}, calcTime("Welcome to Cormeum Access Terminal~~Username: "));
+				addSpeech("Okay, in order to get in here I need to know what username the Professor would use...")
+				step++;
+			}
+			else if(step == 1) { // Step 1: the username step
+				let inp = readInput();
+				if(inp == "stomach") {
+					printText("~~.`.`.`~~Password: ");
+					setTimeout(() => {addSpeech("Alright, that IS a valid username. Cool.~~Come on, Lizzie, it's time to tackle the password.~~(goes through notes)~~Okay then, from what I've found it's an enzyme produced by the stomach... I'm not sure which one it is, so I guess I'll have to input one of them.")}, calcTime("~~.`.`.`~~"));
+					setTimeout(() => {addInput(), isReady = true;}, calcTime("~~.`.`.`~~Password: "));
+					isFirst = true;
+					step++;
+				}
+				else {
+					printText("~~.`.`.`~~Username not found.~~Username: ");
+					if(isFirst) {
+						isFirst = false;
+						setTimeout(() => {addSpeech("Hmm, he does like the digestive system. He's been rambling about it all the time. He still researches a lot about it even though he has.`.`.` another.`.`.` job.~~I think his username is just a part of the digestive system. Probably his most sizable one, heh.")}, calcTime("~~.`.`.`~~"));
+						setTimeout(() => {addInput(); isReady = true;}, calcTime("~~.`.`.`~~Username not found.~~Username: "));
+					}
+					else {
+						setTimeout(() => {addSpeech("No, that can't be it. Let me try again.")}, calcTime("~~.`.`.`~~"));
+						setTimeout(() => {addInput(); isReady = true;}, calcTime("~~.`.`.`~~Username not found.~~Username: "));
+						isReady = true;
+					}
+				}
+			}
+			else if(step == 2) { // Step 2: the password step
+				let inp = readInput();
+				if(inp == "ghrelin") {
+					printText("~~.`.`.~~Access granted.~~Current directory: " + curDir + "~Command | ");
+					setTimeout(() => {
+						var s;
+						if(attempts > 2) {
+							s = "That's it? Wow.~~I can't believe I took " + attempts.toString() + " attempts to get that.~~The enzyme that makes us feel hungry.`.`.` go figure.";
+							addSpeech(s);
+						}
+						else {
+							s = "That's it? Wow.~~The enzyme that makes us feel hungry.`.`.` go figure.";
+							addSpeech(s);
+						}
+					}, calcTime("~~.`.`.`~~"));
+					setTimeout(() => {isReady = true; addInput()}, calcTime("~~.`.`.~~Access granted.~~Current directory: " + curDir + "~Command | "));
+					step++;
+					attempts = 0;
+				}
+				else {
+					printText("~~.`.`.`~~Access denied.~~Password: ");
+					if(isFirst) {
+						isFirst = false;
+						setTimeout(() => {addSpeech("I know the Professor gets pretty cranky when he uses this computer, probably because he's hungry. The password might have something to do with that.")}, calcTime("~~.`.`.`~~"));
+						setTimeout(() => {isReady = true; addInput()}, calcTime("~~.`.`.`~~Access denied.~~Password: "))
+					}
+					else {
+						setTimeout(() => {addSpeech("Nope, wrong enzyme. I'm getting hungrier by the minute...")}, calcTime("~~.`.`.`~~"));
+						setTimeout(() => {isReady = true; addInput()}, calcTime("~~.`.`.`~~Access denied.~~Password: "));
+					}
+				}
+			}
+			else if(step == 3) { // Step 3: the navigation step
+				let inp = readInput();
+				printText("~~oops.")
+				addSpeech("Okay so this is where I'll stop posting the thing, kasi there are still some holes in the directory. For example, where is the link to the professor POV? what is in the text file? what will be the error message? i can't continue the rest without these bits of info.")
+			}
 		}
-		$(document).ready(function(){
- 		   $('#playerInput').keypress(function(e){
-  		     if(e.keyCode==13)
- 		     	$(document).readInput();
- 		   });
+
+		$(document).ready(function() { // Checks if the page is fully loaded before it starts up functions.
+
+			// Below here, put all the starting functions. They will run once the page is ready.
+
+			console.log("ready!");
+			printEvent("A woman in her 20's is working on a laptop...");
+			setTimeout(() => {addSpeech("Alright, here goes nothing. I'm gonna hack his files. ~~(deep breath)~~ Hopefully I won't get in trouble for this. ~~Well, too much trouble. Doing this is trouble enough.");}, 3000)
+			setTimeout(() => {
+				console.log("boop");
+				document.getElementById("startButton").setAttribute('onclick', "terminalStart()");
+				document.getElementById("startButton").style.borderColor = "inherit";
+				document.getElementById("startButton").style.color = "inherit";
+			}, 3000 + calcTimeD("Alright, here goes nothing. I'm gonna hack his files. ~~(deep breath)~~ Hopefully I won't get in trouble for this. ~~Well, too much trouble. Doing this is trouble enough."))
+
+			// Above here, put all the starting functions. They will run once the page is ready.
+			
+			$(document).keyup(function(event) { // Goes to the next step if the user clicks enter AND the page is ready (no more dialogue is being played)
+				if(event.which == 13 && isReady) {
+					terminalStart();
+				}
+			});
+			$("div").focusout(function() { // Autofocuses whenever the box is unclicked.
+				console.log("hello!");
+				setTimeout(() => {$('#playerInput').get(0).focus()}, 10);
+				console.log("hi!");
+			});
 		});
 	</script>
 </head>
+<!--DO NOT EDIT THE BODY WITHOUT MY PERMISSION ~grover-->
 <body>
-	<button type="button" onclick="terminalStart()" id="startButton">Start!</button>
-	<div class="terminal" id="terminal"> <!--green-->
-		
+	<div class="eventtext" id="eventytext">a</div>
+	<div class="terminal" id="terminal"> 
+		<button type="button" class="firstbutton" id="startButton">Start!</button>
 	</div>
-	<div class="dialogue" id="dialogue"> <!--white-->
+	<div class="dialogue" id="dialogue">
 
 	</div>
 </body>

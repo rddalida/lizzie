@@ -174,7 +174,7 @@
 			else if(x>0) isReady = true;
 		}
 		var addInput = function() { // Adds an input box.
-			if(isRunning || !(document.getElementById("terminal").innerHTML.charAt(document.getElementById("terminal").innerHTML.length-2) == '|' || document.getElementById("terminal").innerHTML.charAt(document.getElementById("terminal").innerHTML.length-2) == ':')) {
+			if(!(document.getElementById("terminal").innerHTML.charAt(document.getElementById("terminal").innerHTML.length-2) == '|' || document.getElementById("terminal").innerHTML.charAt(document.getElementById("terminal").innerHTML.length-2) == ':')) {
 				console.log("Trying to add input.");
 				setTimeout(addInput, 10);
 				return;

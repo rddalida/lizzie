@@ -1,15 +1,23 @@
 <!DOCTYPE html>
-<head>
+<html><head>
 	<title> Lizzie </title> <!--narrative: https://docs.google.com/document/d/1y3haiQlp7WBbp-3doUv9EdpjlOtk7HC67qmLCjbsKK4/edit?fbclid=IwAR0QZQ6yI3Hg3s3R0BUAMzacVr5dDYTDyQXLTRfCgbSlvU-nB6lm7oGxmmA-->
-	<meta charset="utf-8" />
-	<meta name="description" content="Can you help me?"/>
-	<meta name="keyword" content="HTML, CSS, JS" />
-	<meta name="author" content="Dylan Dalida" /> <!--Last update: 2020-03-08 22:41-->
+	<link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
+	<link href="https://fonts.googleapis.com/css2?family=Courier+Prime" rel="stylesheet"> 
+	<meta charset="utf-8">
+	<meta name="description" content="Can you help me?">
+	<meta name="keyword" content="HTML, CSS, JS">
+	<meta name="author" content="Dylan Dalida">
+	<!--Last grover update: 2020-04-01 23:30-->
+	<!--Last Mr.D update: 2020-03-11  00:33 -->
+	<!-- NOTES:
+		All marked "window.scrollTo"'s needs activate AFTER the terminal is finished doing it's thing. 
+		-->
 	<style>
 		body {
 			font-family: "Montserrat", "Comfortaa", "Segoe UI", "Calibri", "Verdana";
 			background-color: black;
 			color: #FFFFFF;
+			width: 1000px;
 			/* Put a font here! */
 		}
 		input {
@@ -19,6 +27,18 @@
 			color: inherit;
 			font-family: inherit;
 			font-size: 1em;
+		}
+		.title {
+			position: fixed;
+			width: 100%;
+			height: 100%;
+			z-index: 999;
+			background-color: black;
+			padding: 50px;
+		}
+		#titlepic {
+			width: 274px;
+			height: 79px;
 		}
 		.eventtext {
 			font-family: inherit;
@@ -38,332 +58,191 @@
 			opacity: 0;
 			transition: opacity 1s ease-in-out;
 		}
+		.unhide {
+			animation: appear 1s ease-in-out;
+		}
+		.hide {
+			animation: disappear 1s ease-in-out;
+		}
 		.terminal {
-			background-color: #222222;
-			font-family: "Courier New", "Courier", "Ubuntu Mono", "Ubuntu";
+			background-color: #333333;
+			font-family: "Ubuntu Mono", "Ubuntu", "Courier Prime", "Courier New";
 			color: #33FF00;
-			height: 600px;
+			height: 500px;
 			width: 800px;
 			margin-left: 20%;
 			margin-right: 20%;
 			padding: 15px;
-			left: 0;
-			right: 0;
 			border: 5px solid #33FF00;
 			overflow: auto;
 			font-size: 0.97em;
 		}
 		.dialogue {
-			background-color: #111111;
+			background-color: #222222;
 			font-family: inherit;
 			color: pink;
-			height: 200px;
+			height: 20%;
 			width: 800px;
 			margin-top: 5%;
 			margin-left: 20%;
 			margin-right: 20%;
 			padding: 15px;
-			left: 0;
-			right: 0;
-			border: 2px solid white;
-			overflow: scroll;
+			border-top: 10px solid #999999;
+			border-right: 10px solid #eeeeee;
+			border-bottom: 10px solid #cccccc;
+			border-left: 10px solid #aaaaaa;
+			overflow: none;
 		}
 		.firstbutton {
 			font-family: inherit;
-			padding: 20px;
+			padding: 7px 0px 7px 0px;
+			text-align: center;
+			width: 150px;
 			font-size: inherit;
 			background-color: inherit;
-			border: 2px solid green;
-			color: green;
-			margin-left: 350px;
-			margin-right: 350px;
-			margin-top: 272px;
-			margin-bottom: 272px;
+			border: 2px solid #33FF00;
+			color: #33FF00;
+			margin-top: 20px;
+		}
+		.greenbutton {
+			font-family: inherit;
+			padding: 7px 0px 7px 0px;
+			text-align: center;
+			width: 150px;
+			font-size: inherit;
+			background-color: inherit;
+			border: 2px solid #33FF00;
+			color: #00FF00;
+			margin-top: 20px;
+		}
+		#reloadButton {
+			display: none;
+		}
+		.ending1, .credits1 {
+			padding: 50px;
+			position: fixed;
+			width: 100%;
+			height: 100%;
+			z-index: 998;
+			background-color: black;
+			opacity: 1;
+			display: none;
+		}
+		.credits1 {
+			z-index: 1000;
+		}
+		@keyframes appear {
+			from {
+				opacity: 0;
+			}
+			to {
+				opacity: 1;
+			}
+		}
+		@keyframes uhppear {
+			from {
+				opacity: 0;
+			}
+			to {
+				opacity: 0.8;
+			}
+		}
+		@keyframes disappear {
+			from {
+				opacity: 1;
+			}
+			to {
+				opacity: 0;
+				display: none;
+			}
 		}
 	</style>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-	<script>
-		console.log("hi!"); // Hi! I've added super helpful hints if you want to add stuff in the code
-		// note: for strings, please use a tilde ~ if you want to add a new line
-		var step = 0; // This is used by terminalStart to analyze what step we're in
-		var attempts = 0; // Number of times the player entered a command/password, used in steps 2 and 3.
-		var isReady = false; // This is used by the keyUp jquery thing to check when to register enter presses
-		var isFirst = true; // This checks if the mistake was the first one.
-		var curDir = "/" // This displays the current directory.
-		var layer = 0; // The layer the player is in. Used in step 3.
-		var isRunning = false; // A last resort, used in step 3 to determine if a function is running or not.
-		var currS = ""; // A last resort, used in step 3 to determine the current string being printed.
-		var priority = 0; // A last resort, checks the priority for functions. Lower is more urgent. Lower-priority functions go first.
-		var dirList = [
-			["Documents", "Downloads", "Games", "Music"],
-			["Physics", "Biology", "Chemistry", "Math", "Computer Science"],
-			["Zoology", "Botany", "Microbiology", "Morphology", "Cell Biology"],
-			["Morphology", "Anatomy", "Physiology", "Cytology", "Histology", "Genetics"],
-			["Mammals", "Reptiles", "Amphibians", "Fish"],
-			["Pigs", "Cows", "Koalas", "Humans"],
-			["organsystems.txt", "cells.txt"]
-		]; // List of directories.
-		var corList = [0, 1, 0, 2, 0, 3, 0];
-		var calcTime = function(s) { // Calculates the length of time it'll take for text in the terminal to load.
-			let ans = 0;
-			for(let i = 0; i < s.length; i++) {
-				if(s.charAt(i)=="~" || s.charAt(i)=="`") ans += 500;
-				else ans += 50;
-			}
-			return ans+500;
-		}
-		var calcTimeD = function(s) { // Calculates the length of time it'll take for the text in the dialog box to load.
-			let ans = 0;
-			for(let i = 0; i < s.length; i++) {
-				if(s.charAt(i)=="~" || s.charAt(i)=="`") ans += 300;
-				else ans += 30;
-			}
-			return ans+300;
-		}
-		var printEvent = function(s) { // Displays the event (colored in white) on the upper-left hand corner.
-			console.log(s);
-			var evt = document.getElementById("eventytext");
-			console.log(evt);
-			evt.innerHTML = s;
-			evt.className = "eventtext unhidden";
-			setTimeout(() => {evt.className = "eventtext hidden"}, 3000)
-		}
-		var printText = function(s, x = 0) { // Prints text in the terminal
-			if(x==0 && isRunning) {
-				setTimeout(() => {printText(s, x)}, 10);
-				return;
-			}
-			isRunning = true;
-			console.log(s);
-			isReady = false;
-			if(x < s.length) {
-				if(s.charAt(x) == '~') {
-					document.getElementById("terminal").scrollTop = document.getElementById("terminal").scrollHeight;
-					document.getElementById("terminal").innerHTML += "<br>";
-					setTimeout(() => { printText(s, x+1); }, 500);
-				}
-				else if(s.charAt(x) == '`') {
-					setTimeout(() => { printText(s, x+1); }, 500);
-				}
-				else {
-					document.getElementById("terminal").innerHTML += s.charAt(x);
-					setTimeout(() => { printText(s, x+1); }, 50);
-				}
-			}
-			else {
-				isReady = true;
-				isRunning = false;
-			}
-		}
-		var addSpeech = function(s, x = 0) { // Adds the dialogue at the bottom.
-			isReady = false;
-			if(x == 0) document.getElementById("dialogue").innerHTML = "";
-			if(x < s.length) {
-				if(s.charAt(x) == '~') {
-					document.getElementById("dialogue").innerHTML += "<br>";
-					setTimeout(() => { addSpeech(s, x+1); }, 300);
-				}
-				else if(s.charAt(x) == '`') {
-					setTimeout(() => { addSpeech(s, x+1); }, 300);
-				}
-				else {
-					document.getElementById("dialogue").innerHTML += s.charAt(x);
-					setTimeout(() => { addSpeech(s, x+1); }, 30);
-				}
-			}
-			else if(x>0) isReady = true;
-		}
-		var addInput = function() { // Adds an input box.
-			if(!(document.getElementById("terminal").innerHTML.charAt(document.getElementById("terminal").innerHTML.length-2) == '|' || document.getElementById("terminal").innerHTML.charAt(document.getElementById("terminal").innerHTML.length-2) == ':')) {
-				console.log("Trying to add input.");
-				setTimeout(addInput, 10);
-				return;
-			}
-			var inpform = document.createElement("input");
-			inpform.type = "text";
-			inpform.id = "playerInput";
-			inpform.maxLength = 20;
-			document.getElementById("terminal").appendChild(inpform); 
-			document.getElementById("playerInput").focus();
-		}
-		var readInput = function() { // Function for reading the input and replacing the box with text. MUST BE FOLLOWED by a validator once called
-			console.log("reading input!");
-			let inp = document.getElementById("playerInput").value;
-			let termi = document.getElementById("terminal");
-			termi.removeChild(termi.childNodes[termi.childNodes.length-1])
-			termi.innerHTML += ' ' + inp + '\n';
-			return inp.toLowerCase();
-		}
-
-		var terminalStart = function() { // The "main" function with the game flow; it will be called once you click start or press enter
-			if(isReady == false && step == 0) {
-				printEvent("Lizzie isn't finished talking yet.")
-				$(window).scrollTop(0);
-			}
-			isReady = false; // Makes it so you can't press enter while the command is commanding.
-			console.log(step);
-			if(step == 0) { // Step 0: the intro step
-				$("#startButton").hide();
-				printText("Welcome to Cormeum Access Terminal~~Username: ");
-				setTimeout(() => {addInput();}, calcTime("Welcome to Cormeum Access Terminal~~Username: "));
-				addSpeech("Okay, in order to get in here I need to know what username the Professor would use...");
-				step++;
-			}
-			else if(step == 1) { // Step 1: the username step
-				let inp = readInput();
-				if(inp == "stomach") {
-					printText("~~.`.`.`~~Password: ");
-					setTimeout(() => {addSpeech("Alright, that IS a valid username. Cool.~~Come on, Lizzie, it's time to tackle the password.~~(goes through notes)~~Okay then, from what I've found it's an enzyme produced by the stomach... I'm not sure which one it is, so I guess I'll have to input one of them.")}, calcTime("~~.`.`.`~~"));
-					setTimeout(() => {addInput();}, calcTime("~~.`.`.`~~Password: "));
-					isFirst = true;
-					step++;
-				}
-				else {
-					printText("~~.`.`.`~~Username not found.~~Username: ");
-					if(isFirst) {
-						isFirst = false;
-						setTimeout(() => {addSpeech("Hmm, he does like the digestive system. He's been rambling about it all the time. He still researches a lot about it even though he has.`.`.` another.`.`.` job.~~I think his username is just a part of the digestive system. Probably his most sizable one, heh.");}, calcTime("~~.`.`.`~~"));
-						setTimeout(() => {addInput();}, calcTime("~~.`.`.`~~Username not found.~~Username: "));
-					}
-					else {
-						setTimeout(() => {addSpeech("No, that can't be it. Let me try again.")}, calcTime("~~.`.`.`~~"));
-						setTimeout(() => {addInput();}, calcTime("~~.`.`.`~~Username not found.~~Username: "));
-					}
-				}
-			}
-			else if(step == 2) { // Step 2: the password step
-				let inp = readInput();
-				if(inp == "ghrelin") {
-					printText("~~.`.`.~~Access granted.~~Current directory: " + curDir + "~Command | ");
-					setTimeout(() => {
-						var s;
-						if(attempts > 2) {
-							s = "That's it? Wow.~~I can't believe I took " + attempts.toString() + " attempts to get that.~~The enzyme that makes us feel hungry.`.`.` go figure.";
-							addSpeech(s);
-						}
-						else {
-							s = "That's it? Wow.~~The enzyme that makes us feel hungry.`.`.` go figure.";
-							addSpeech(s);
-						}
-					}, calcTime("~~.`.`.`~~"));
-					setTimeout(() => {addInput()}, calcTime("~~.`.`.~~Access granted.~~Current directory: " + curDir + "~Command | "));
-					step++;
-					attempts = 0;
-				}
-				else {
-					printText("~~.`.`.`~~Access denied.~~Password: ");
-					if(isFirst) {
-						isFirst = false;
-						setTimeout(() => {addSpeech("I know the Professor gets pretty cranky when he uses this computer, probably because he's hungry. The password might have something to do with that.")}, calcTime("~~.`.`.`~~"));
-						setTimeout(() => {addInput()}, calcTime("~~.`.`.`~~Access denied.~~Password: "))
-					}
-					else {
-						setTimeout(() => {addSpeech("Nope, wrong enzyme. I'm getting hungrier by the minute...")}, calcTime("~~.`.`.`~~"));
-						setTimeout(() => {addInput()}, calcTime("~~.`.`.`~~Access denied.~~Password: "));
-					}
-				}
-			}
-			else if(step == 3) { // Step 3: the navigation step
-				let inp = readInput();
-				let arr = inp.split(" ", 2);
-				console.log(arr[0]);
-				if(arr[0] == "ls") {
-					printText("~~List of contents in the current directory:");
-					let i = 0;
-					for(i; i < dirList[layer].length; i++) printText("~" + dirList[layer][i]);
-				}
-				else if(arr[0] == "cd") {
-					if(arr[1] == "..") {
-						if(layer == 0) {
-							printText("~~Error: no directory to go back to.")
-						}
-						else {
-							let i = 0;
-							layer--;
-							let str = curDir;
-							curDir = str.slice(0, curDir.length - (dirList[layer][corList[layer]].length + 1));
-						}
-					}
-					else {
-						if(layer < 6) {
-							let i = 0;
-							for(i; i < dirList[layer].length; i++) {
-								if(arr[1] == dirList[layer][i].toLowerCase()) {
-									curDir += (dirList[layer][i] + "/");
-									layer++;
-									i = 999;
-								}
-							}
-							if(i == dirList[layer].length) {
-								printText("~~Error: directory not found.")
-							}
-						}
-						else {
-							printText("~~Error: directory not found.");
-						}
-					}
-				}
-				else if(arr[0] == "cat" && arr[1].charAt(arr[1].length - 4)) {
-					let i = 0;
-					for(i = 0; i < dirList[layer].length; i++) {
-						if(arr[1] == dirList[layer][i].toLowerCase()) {
-							printText("~~" + dirList[layer][i]);
-						}
-					}
-					if(i == dirList[layer].length) printText("~~Error: file not found.");
-				}
-				else if(arr[0] == "help") {
-					printText("~~Available commands:~~ls~Usage: ls~~- Lists down all the files and directories within the current folder~~cd~Usage: cd [directory]~~- Changes the directory (folder) to the one specified in [directory].~(Tip: Use '..' as the directory to go back to the previous directory.)~~cat~Usage: cat [filename]~~- Displays the contents of a file.~~help~Usage: help~~- Displays a list of available commands.");
-				}
-				else {
-					printText("~~Command not found.~Type 'help' for a list of available commands.");
-				}
-				printText("~~Current directory: " + curDir + "~Command | ");
-				addInput();
-			}
-		}
-
-		$(document).ready(function() { // Checks if the page is fully loaded before it starts up functions.
-
-			// Below here, put all the starting functions. They will run once the page is ready.
-
-			console.log("ready!");
-			$(window).scrollTop(0);
-			printEvent("A woman in her 20's is working on a laptop...");
-			setTimeout(() => {addSpeech("Alright, here goes nothing. I'm gonna hack his files. ~~(deep breath)~~ Hopefully I won't get in trouble for this. ~~Well, too much trouble. Doing this is trouble enough.");}, 3000)
-			setTimeout(() => {
-				console.log("boop");
-				document.getElementById("startButton").setAttribute('onclick', "terminalStart()");
-				document.getElementById("startButton").style.borderColor = "inherit";
-				document.getElementById("startButton").style.color = "inherit";
-			}, 3000 + calcTimeD("Alright, here goes nothing. I'm gonna hack his files. ~~(deep breath)~~ Hopefully I won't get in trouble for this. ~~Well, too much trouble. Doing this is trouble enough."))
-
-			// Above here, put all the starting functions. They will run once the page is ready.
-			
-			$(document).keyup(function(event) { // Goes to the next step if the user clicks enter AND the page is ready (no more dialogue is being played)
-				if(event.which == 13 && isReady) {
-					terminalStart();
-				}
-				else if(event.which == 13 && !isReady) {
-					printEvent("Lizzie isn't finished talking yet.")
-					$(window).scrollTop(0);
-				}
-			});
-			$("div").focusout(function() { // Autofocuses whenever the box is unclicked.
-				console.log("hello!");
-				setTimeout(() => {$('#playerInput').get(0).focus()}, 10);
-				console.log("hi!");
-			});
-		});
-	</script>
+	<script src="./js/script.js"></script>
 </head>
-<!--DO NOT EDIT THE BODY WITHOUT MY PERMISSION ~grover-->
+<!--DO NOT EDIT THE BODY WITHOUT MY PERMISSION-->
 <body>
-	<div class="eventtext" id="eventytext">a</div>
-	<div class="terminal" id="terminal"> 
-		<button type="button" class="firstbutton" id="startButton">Start!</button>
+	<audio id="terminalMus">
+		<source src="./audio/terminal.mp3" type="audio/mpeg">
+	</audio>
+	<audio id="ending1Mus">
+		<source src="./audio/prof.mp3" type="audio/mpeg">
+	</audio>
+	<audio id="risingMus">
+		<source src="./audio/rising.mp3" type="audio/mpeg">
+	</audio>
+	<audio id="error">
+		<source src="./audio/error.mp3" type="audio/mpeg">
+	</audio>
+	<audio id="success">
+		<source src="./audio/success.mp3" type="audio/mpeg">
+	</audio>
+	<audio id="fatalerror">
+		<source src="./audio/fatalerror.mp3" type="audio/mpeg">
+	</audio>
+	<audio id="smash">
+		<source src="./audio/smash.mp3" type="audio/mpeg">
+	</audio>
+	<audio id="scream3">
+		<source src="./audio/scream3.mp3" type="audio/mpeg">
+	</audio>
+	<audio id="crash">
+		<source src="./audio/crash.mp3" type="audio/mpeg">
+	</audio>
+	<audio id="logon">
+		<source src="./audio/logon.mp3" type="audio/mpeg">
+	</audio>
+	<audio id="papers">
+		<source src="./audio/papers.mp3" type="audio/mpeg">
+	</audio>
+	<audio id="breath">
+		<source src="./audio/breath.mp3" type="audio/mpeg">
+	</audio>
+	<div class="title" id="title"><img src="./images/title.png" id="titlepic" /><br><button type="button" class="greenbutton" id="startButton">Start!</button><br><button type="button" class="firstbutton" id="reloadButton" onclick="reload()">Reload</button><br><br><span style="color: red;">WARNING: This project contains themes and images involving violence which some may find disturbing.<br>Player discretion is advised.</span><br><br>(Wear headphones for a more immersive experience.)</div>
+	<div class="ending1" id="ending1">You have reached Ending 1: Beaker of Doom.<br><br>Try again?<br><button type="button" class="firstbutton" id="yes">Yes</button><br><button type="button" class="firstbutton" id="no">No</button></div>
+	<div class="credits1" id="credits1">
+		Thank you for playing! There's a lot more to discover, so you might want to try out other endings.
+
+		Credits:
+		<ul>
+			<li>Story and concept:
+			<ul>
+				<li>BELDA, Jez</li>
+				<li>PADILLA, Yani</li>
+				<li>PULUMBARIT, Ramon</li>
+			</ul>
+			</li>
+			<li>Code:
+			<ul>
+				<li>DALIDA, Dylan</li>
+			</ul>
+			</li>
+			<li>Art:
+				<ul>
+					<li>BELDA, Jez</li>
+				</ul>
+			</li>
+			<li>Music:
+			<ul>
+				<li>In the terminal: The Dread - Kevin Macleod</li>
+				<li>With the professor: Shadowlands 2 - Kevin Macleod</li>
+			</ul>
+			</li>
+			<li>Sound effects:
+			<ul>
+				<li>Battery critical, critical stop, exclamation, logon from Windows Longhorn: https://www.youtube.com/watch?v=hbrsTWKZ9Gg</li>
+				<li>Glass breaking: https://www.youtube.com/watch?v=ovQC32AKAnU</li>
+				<li>Woman scream: https://www.youtube.com/watch?v=BFqHyCoypfM</li>
+				<li>Paper shuffle: https://www.soundsnap.com/shaking_paper_check_02_wav</li>
+				<li>Breath: https://www.youtube.com/watch?v=vQGovXjA4Wo</li>
+			</ul>
+			</li>
+		</ul>
+		To replay, please refresh the page.
+	</div>
+	<div class="eventtext hidden" id="eventytext"></div>
+	<div class="terminal" id="terminal">
 	</div>
 	<div class="dialogue" id="dialogue">
-
 	</div>
-</body>
+</body></html>
